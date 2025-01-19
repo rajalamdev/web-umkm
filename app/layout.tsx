@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { headers } from 'next/headers';
+import { LayoutProvider } from "@/components/layout/LayoutProvider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -26,15 +26,9 @@ export default function RootLayout({
       <body
         className={` ${poppins.variable} antialiased`}
       >
-        <header>
-          <Navbar />
-        </header>
-        <main>
+        <LayoutProvider>
           {children}
-        </main>
-        <footer>
-          <Footer />
-        </footer>
+        </LayoutProvider>
       </body>
     </html>
   );

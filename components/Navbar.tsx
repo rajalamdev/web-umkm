@@ -69,9 +69,11 @@ const Navbar = () => {
         {/* right */}
         <div className='flex items-center space-x-6'>
           <CartIcon />
-          <Button className='rounded-full py-5 px-8 hidden lg:flex'>
-            Sign in
-          </Button>
+          <Link href="/login">
+            <Button className='rounded-full py-5 px-8 hidden lg:flex'>
+              Sign in
+            </Button>
+          </Link>
           <button className='lg:hidden' onClick={() => setIsSidebarOpen(true)}>
             <svg className="w-7 h-7" fill="#000" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path fillRule="evenodd"
