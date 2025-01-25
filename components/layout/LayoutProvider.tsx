@@ -5,6 +5,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "../Navbar";
 import Footer from "../Footer";
+import { Toaster } from "../ui/toaster";
 
 export const LayoutProvider = ({
   children,
@@ -17,6 +18,7 @@ export const LayoutProvider = ({
     <>
       <header>
         <Navbar />
+        <Toaster />
       </header>
       <main>{children}</main>
       {!isAuthPage && (
