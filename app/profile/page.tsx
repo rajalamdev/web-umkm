@@ -8,6 +8,8 @@ export default function page() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [address, setAddress] = useState("");
+  const [gmapsLink, setGmapsLink] = useState("");
 
   // Fetch user profile
   useEffect(() => {
@@ -108,6 +110,7 @@ export default function page() {
             <div>
               <p className="text-sm">Nomor Telp</p>
               <input
+                placeholder="ex: 0881234456"
                 type="text"
                 className="w-full p-3 border mb-4 mt-2 rounded-lg"
               />
@@ -116,6 +119,22 @@ export default function page() {
               <p className="text-sm">Photo Profile</p>
               <input
                 type="file"
+                className="w-full p-3 border mt-2 mb-4 rounded-lg bg-white"
+              />
+            </div>
+            <div>
+              <p className="text-sm">Alamat</p>
+              <input
+                placeholder="Masukkan Detail Alamat"
+                type="text"
+                className="w-full p-3 border mt-2 mb-4 rounded-lg bg-white"
+              />
+            </div>
+            <div>
+              <p className="text-sm">Link Google Maps</p>
+              <input
+                placeholder="Masukkan Link yang didapat dari Google Maps"
+                type="text"
                 className="w-full p-3 border mt-2 rounded-lg bg-white"
               />
             </div>
