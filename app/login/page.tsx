@@ -1,14 +1,80 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Loading from "@/components/loading";
+import { FaRegCheckCircle, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showIcon, setShowIcon] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add login logic here
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone_email: email,
+            password: password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorMessage =
+          data.meta?.validations?.phone_email?.[0] ||
+          data.meta?.validations?.password?.[0] ||
+          data.meta?.messages?.[0] ||
+          "Failed to Login";
+        setError(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      toast({
+        title: (
+          <div className="flex items-center gap-2">
+            <FaRegCheckCircle className="text-green-500 text-xl" />
+            <span className="font-bold text-lg text-gray-800">
+              Login Berhasil!
+            </span>
+          </div>
+        ),
+        description: (
+          <span className="text-gray-600">Silahkan coba fitur lainnya</span>
+        ),
+      });
+
+      localStorage.setItem("token", data.data.token);
+
+      window.location.href = "/";
+      setError(null);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+    setShowIcon(!showIcon);
   };
 
   return (
@@ -17,6 +83,11 @@ export default function LoginPage() {
         <h2 className="text-2xl font-bold mb-6 text-accent text-center">
           Sign In.
         </h2>
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 text-red-600 rounded">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <input
             type="email"
@@ -25,24 +96,39 @@ export default function LoginPage() {
             placeholder="Enter your email"
             className="w-full p-3 border rounded-lg mb-4"
           />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
-            className="w-full p-3 border rounded-lg mb-2"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full p-3 border rounded-lg mb-2"
+            />
+            <div className="absolute bottom-6 right-0 flex items-center pr-3 cursor-pointer">
+              {showIcon ? (
+                <FaRegEyeSlash onClick={handleShowPassword} />
+              ) : (
+                <FaRegEye onClick={handleShowPassword} />
+              )}
+            </div>
+          </div>
           <div className="text-right mb-4">
             <Link href="/forgot-password" className="text-accent text-sm">
               Forgot password?
             </Link>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-accent text-white p-3 rounded-lg mb-4"
-          >
-            Login
-          </button>
+          {isLoading ? (
+            <div className="flex justify-center mb-4">
+              <Loading /> {/* Komponen loading ditampilkan */}
+            </div>
+          ) : (
+            <button
+              type="submit"
+              className="w-full bg-accent text-white p-3 rounded-lg mb-4"
+            >
+              Login
+            </button>
+          )}
         </form>
 
         <div className="relative mb-4">
