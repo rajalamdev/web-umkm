@@ -5,6 +5,7 @@ import Loading from "@/components/loading";
 import { FaRegCheckCircle, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useAuth } from '@/lib/store/useAuth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   const router = useRouter();
+  const { setToken, setUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +38,7 @@ export default function LoginPage() {
       );
 
       const data = await response.json();
+      console.log(data)
 
       if (!response.ok) {
         const errorMessage =
@@ -46,6 +49,18 @@ export default function LoginPage() {
         setError(errorMessage);
         throw new Error(errorMessage);
       }
+
+      setToken(data.data.token);
+      // setUser({
+      //   id: data.data.id,
+      //   name: data.data.name,
+      //   email: data.data.email,
+      //   birth_date: data.data.birth_date,
+      //   gender: data.data.gender,
+      //   phone: data.data.phone,
+      //   photo_url: data.data.photo_url,
+      //   username: data.data.username,
+      // });
 
       toast({
         title: (
@@ -60,8 +75,6 @@ export default function LoginPage() {
           <span className="text-gray-600">Silahkan coba fitur lainnya</span>
         ),
       });
-
-      localStorage.setItem("token", data.data.token);
 
       window.location.href = "/";
       setError(null);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/lib/store/useAuth";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
@@ -9,12 +10,13 @@ export default function page() {
   const [phone, setPhone] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [address, setAddress] = useState("");
+  const [gender, setGender] = useState<string>("");
   const [gmapsLink, setGmapsLink] = useState("");
+  const {token} = useAuth()
 
   // Fetch user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const token = localStorage.getItem("token");
       if (!token) return;
 
       try {
@@ -30,8 +32,13 @@ export default function page() {
 
         if (response.ok) {
           const data = await response.json();
-          setName(data.data.name);
-          setEmail(data.data.email);
+          setName(data.data.name || "");
+          setEmail(data.data.email || "");
+          setPhone(data.data.phone || "");
+          setBirthDate(data.data.birth_date || "");
+          setAddress(data.data.address || "");
+          setGender(data.data.gender || "");
+          setGmapsLink(data.data.gmapsLink || "");
         } else {
           console.error("Failed to fetch user profile");
         }
@@ -43,14 +50,51 @@ export default function page() {
     fetchUserProfile();
   }, []);
 
+  async function editProfileHandler(e: React.FormEvent) {
+    e.preventDefault();
+    if (!token) return;
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/profile`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              photo: "",
+              username: "",
+              gender: gender === "" ? "Laki-Laki" : gender,
+              birt_date: birthDate,
+              _method: "PATCH"
+            }),
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+
+        } else {
+          console.error("Failed to Update user profile");
+        }
+      } catch (error) {
+        console.error("Error Update user profile:", error);
+      }
+  }
+
   return (
     <div className="container mx-auto py-32">
-      <form className="bg-gray-100 rounded-xl p-20">
+      <form onSubmit={editProfileHandler} className="bg-gray-100 rounded-xl p-10 w-full max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-5">
             <Image
               className="rounded-full"
-              src={"/image/rendang.png"}
+              src={"/pp-default.png"}
               width={200}
               height={300}
               alt="profile"
@@ -64,7 +108,7 @@ export default function page() {
             type="submit"
             className="rounded-lg bg-[#F7411B] text-white px-6 py-2"
           >
-            Edit
+            Save
           </button>
         </div>
         <div className="flex gap-5">
@@ -93,23 +137,30 @@ export default function page() {
               <p className="text-sm">Tanggal Lahir</p>
               <input
                 type="date"
-                placeholder="Enter your Birthdate"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
                 className="w-full p-3 border mb-4 mt-2 rounded-lg"
               />
             </div>
             <div>
               <p className="text-sm">Jenis Kelamin</p>
-              <input
-                type="text"
-                placeholder="Laki-Laki/Perempuan"
+              <select
+                value={gender || ""}
+                onChange={(e) => setGender(e.target.value)}
                 className="w-full p-3 border mt-2 rounded-lg"
-              />
+              >
+                <option value="" disabled>Pilih Jenis Kelamin</option>
+                <option value="Laki-Laki">Laki-Laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
             </div>
           </div>
           <div className="w-1/2">
             <div>
               <p className="text-sm">Nomor Telp</p>
               <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 placeholder="ex: 0881234456"
                 type="text"
                 className="w-full p-3 border mb-4 mt-2 rounded-lg"
@@ -125,6 +176,8 @@ export default function page() {
             <div>
               <p className="text-sm">Alamat</p>
               <input
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 placeholder="Masukkan Detail Alamat"
                 type="text"
                 className="w-full p-3 border mt-2 mb-4 rounded-lg bg-white"
@@ -133,6 +186,8 @@ export default function page() {
             <div>
               <p className="text-sm">Link Google Maps</p>
               <input
+                value={gmapsLink}
+                onChange={(e) => setGmapsLink(e.target.value)}
                 placeholder="Masukkan Link yang didapat dari Google Maps"
                 type="text"
                 className="w-full p-3 border mt-2 rounded-lg bg-white"

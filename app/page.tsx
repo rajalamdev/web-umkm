@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <div>
       {/* hero section */}
-      <section className="h-screen bg-gradient-to-b from-[#ff715b] via-[#fff] to-[#fff]">
+      <section className="h-screen">
         <div className="container mx-auto h-full">
           <div className="items-center lg:flex h-full pt-32 lg:pt-0">
               <div className="w-full lg:w-1/2">

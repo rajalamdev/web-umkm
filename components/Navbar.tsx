@@ -6,12 +6,14 @@ import { Button } from "./ui/button";
 import Link from "next/link";
 import CartIcon from "./CartIcon";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/store/useAuth";
+import Image from "next/image";
 
 const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const { token, user, setToken, setUser, clearAuth } = useAuth();
   const router = useRouter();
 
   const navLinks = [
@@ -44,7 +46,8 @@ const Navbar = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setUserName(data.data.name);
+          console.log(data);
+          setUser(data.data);
         } else {
           console.error("Failed to fetch user profile");
         }
@@ -54,13 +57,16 @@ const Navbar = () => {
     };
 
     fetchUserProfile();
-  }, []);
+  }, [setUser]);
 
   // When sign out, redirect to login page
   const handleSignOut = () => {
     localStorage.removeItem("token");
     setUserName(null);
+    clearAuth();
     router.push("/login");
+    setIsDropdownOpen(false)
+    setIsSidebarOpen(false)
   };
 
   return (
@@ -68,7 +74,8 @@ const Navbar = () => {
       <div className="flex flex-wrap items-center gap-4 w-full justify-between">
         {/* left */}
         <Link href="/">
-          <h3 className="text-2xl font-extrabold">For UMKM</h3>
+          <Image src={"/cp-logo.png"} alt="Company Logo" width={100} height={100} />
+          {/* <h3 className="text-2xl font-extrabold">For UMKM</h3> */}
         </Link>
 
         {/* center */}
@@ -111,9 +118,10 @@ const Navbar = () => {
               id="search"
             />
           </label>
+          {/* sidebar mobile */}
           <div
             className={`lg:!flex lg:flex-auto max-lg:fixed max-lg:w-1/2 max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50 ${
-              isSidebarOpen ? "block bg-white" : "max-lg:hidden bg-none"
+              isSidebarOpen ? "flex flex-col bg-white" : "max-lg:hidden bg-none"
             }`}
           >
             <ul className="lg:flex lg:gap-x-12 max-lg:space-y-2">
@@ -125,22 +133,54 @@ const Navbar = () => {
                 </li>
               ))}
             </ul>
+            {user && isSidebarOpen && (
+
+            <div className="flex-1 flex flex-col justify-end items-start text-left py-4">
+              <div className="border-t w-full mb-4"></div>
+              <button className="flex items-center" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+                <Image src={"/pp-default.png"} alt="Profile Picture" width={60} height={60} />
+                <div>
+                  <p className="text-lg text-left">{user.name}</p>
+                  <p className="text-sm text-gray-700 text-left">{user.email}</p>
+                </div>
+              </button>
+              {isDropdownOpen && ( 
+                <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg">
+                  <div className="border-t"></div>
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>  
+            )}
           </div>
         </div>
 
         {/* right */}
         <div className="flex items-center space-x-6">
           <CartIcon />
-          {userName ? (
-            <div className="relative">
+          {user ? (
+            <div className="relative hidden lg:block">
               <Button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="font-semibold"
               >
-                {userName}
+                {user.name}
               </Button>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg">
+        
+                  <div className="border-t"></div>
                   <Link
                     href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -158,12 +198,12 @@ const Navbar = () => {
             </div>
           ) : (
             <Link href="/login">
-              <Button className="rounded-full py-5 px-8 hidden lg:flex">
+              <Button className="rounded-full py-5 px-8 flex">
                 Sign in
               </Button>
             </Link>
           )}
-          <button className="lg:hidden" onClick={() => setIsSidebarOpen(true)}>
+          <button className={`lg:hidden ${!user && 'hidden'}`} onClick={() => setIsSidebarOpen(true)}>
             <svg
               className="w-7 h-7"
               fill="#000"
