@@ -72,16 +72,18 @@ export default function OtpInput({
   const handleResend = async () => {
     setResendLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/resend-otp`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const endpoint =
+        type === "register"
+          ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/resend-otp`
+          : `${process.env.NEXT_PUBLIC_BASE_URL}/api/forgot-password/resend-otp`;
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
       if (!response.ok) {
         const data = await response.json();
