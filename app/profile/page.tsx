@@ -116,8 +116,8 @@ export default function page() {
         onSubmit={editProfileHandler}
         className="bg-gray-100 rounded-xl p-10 w-full max-w-2xl mx-auto"
       >
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-5">
+        <div className="md:flex items-center justify-between mb-10">
+          <div className="md:flex items-center gap-5">
             <Image
               className="rounded-full"
               src={"/pp-default.png"}
@@ -143,8 +143,8 @@ export default function page() {
             </button>
           )}
         </div>
-        <div className="flex gap-5">
-          <div className="w-1/2">
+        <div className="md:flex gap-5">
+          <div className="md:w-1/2">
             <div>
               <p className="text-sm">Email</p>
               <input
@@ -199,7 +199,7 @@ export default function page() {
               </select>
             </div>
           </div>
-          <div className="w-1/2">
+          <div className="md:w-1/2">
             <div>
               <p className="text-sm">Nomor Telp</p>
               <input
@@ -232,7 +232,7 @@ export default function page() {
               <input
                 value={gmapsLink}
                 onChange={(e) => setGmapsLink(e.target.value)}
-                placeholder="Masukkan Link yang didapat dari Google Maps"
+                placeholder="Masukkan Link dari Google Maps"
                 type="text"
                 className="w-full p-3 border mt-2 rounded-lg bg-white"
               />
