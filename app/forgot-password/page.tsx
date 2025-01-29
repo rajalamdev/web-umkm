@@ -14,7 +14,7 @@ export default function RegisterPage() {
   async function handleSubmit(inputEmail: string) {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/register`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/forgot-password/request`,
         {
           method: "POST",
           headers: {
@@ -45,7 +45,7 @@ export default function RegisterPage() {
   async function handleVerify(otpValue: string) {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/check-otp-register`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/forgot-password/check-otp`,
         {
           method: "POST",
           headers: {
@@ -80,7 +80,7 @@ export default function RegisterPage() {
   ) {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/verify-register`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/forgot-password/reset-password`,
         {
           method: "POST",
           headers: {
@@ -123,20 +123,20 @@ export default function RegisterPage() {
           </div>
         )}
         {!email ? (
-          <EmailInput onSubmit={handleSubmit} type="register" />
+          <EmailInput onSubmit={handleSubmit} type="forgot-password" />
         ) : !isOtpVerified ? (
           <OtpInput
             email={email}
             setIsOtpVerified={setIsOtpVerified}
             onVerify={handleVerify}
-            type="register"
+            type="forgot-password"
           />
         ) : (
           <RegistrationForm
             email={email}
             onSubmit={handlePassword}
             otp={otp}
-            type="register"
+            type="forgot-password"
           />
         )}
       </div>

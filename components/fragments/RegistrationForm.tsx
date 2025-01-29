@@ -17,9 +17,13 @@ interface RegistrationFormProps {
     password: string,
     passwordConfirmation: string
   ) => Promise<boolean>;
+  type: "register" | "forgot-password";
 }
 
-export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
+export default function RegistrationForm({
+  onSubmit,
+  type,
+}: RegistrationFormProps) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
@@ -41,7 +45,9 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
             <div className="flex items-center gap-2">
               <FaCheckCircle className="text-green-500 text-xl" />
               <span className="font-bold text-lg text-gray-800">
-                Pembuatan Akun Berhasil!
+                {type === "register"
+                  ? "Pembuatan Akun Berhasil!"
+                  : "Reset Password Berhasil!"}
               </span>
             </div>
           ),
@@ -67,7 +73,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
   return (
     <div className="max-w-md mx-auto p-6">
       <h2 className="text-2xl font-bold mb-6 text-center text-accent">
-        Atur password
+        {type === "register" ? "Atur Password" : "Reset Your Password"}
       </h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -102,7 +108,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
             type="submit"
             className="w-full bg-accent text-white p-3 rounded-lg mb-4"
           >
-            Continue
+            {type === "register" ? "Continue" : "Reset Password"}
           </button>
         )}
       </form>

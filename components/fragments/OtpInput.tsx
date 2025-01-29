@@ -5,12 +5,14 @@ interface OtpInputProps {
   email: string;
   setIsOtpVerified: React.Dispatch<React.SetStateAction<boolean>>;
   onVerify: (otp: string) => void;
+  type: "register" | "forgot-password";
 }
 
 export default function OtpInput({
   email,
   setIsOtpVerified,
   onVerify,
+  type,
 }: OtpInputProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
@@ -98,7 +100,11 @@ export default function OtpInput({
 
   return (
     <div className="max-w-md mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6">Enter Verification Code</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        {type === "register"
+          ? "Enter Verification Code"
+          : "Reset Password Verification"}
+      </h2>
       <p className="text-gray-600 mb-6">We sent a code to {email}</p>
       <div className="flex gap-2 mb-6 justify-center">
         {otp.map((digit, index) => (

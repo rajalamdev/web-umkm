@@ -4,9 +4,10 @@ import Loading from "../loading";
 
 interface EmailInputProps {
   onSubmit: (email: string) => void;
+  type: "register" | "forgot-password";
 }
 
-export default function EmailInput({ onSubmit }: EmailInputProps) {
+export default function EmailInput({ onSubmit, type }: EmailInputProps) {
   const [inputEmail, setInputEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -25,7 +26,7 @@ export default function EmailInput({ onSubmit }: EmailInputProps) {
   return (
     <div className="max-w-md mx-auto p-6">
       <h2 className="text-2xl font-bold mb-6 text-accent text-center">
-        Daftar
+        {type === "register" ? "Daftar" : "Forgot Password"}
       </h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -50,10 +51,21 @@ export default function EmailInput({ onSubmit }: EmailInputProps) {
       </form>
       <div className="text-center">
         <p className="text-gray-600">
-          Have an account?{" "}
-          <Link href="/login" className="text-accent">
-            Login
-          </Link>
+          {type === "register" ? (
+            <>
+              Have an account?{" "}
+              <Link href="/login" className="text-accent">
+                Login
+              </Link>
+            </>
+          ) : (
+            <>
+              Remembered your password?{" "}
+              <Link href="/login" className="text-accent">
+                Login
+              </Link>
+            </>
+          )}
         </p>
       </div>
     </div>
