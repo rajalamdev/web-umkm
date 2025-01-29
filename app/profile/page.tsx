@@ -1,18 +1,25 @@
 "use client";
 
+import Loading from "@/components/loading";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/store/useAuth";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { FaRegCheckCircle } from "react-icons/fa";
 
 export default function page() {
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [address, setAddress] = useState("");
   const [gender, setGender] = useState<string>("");
   const [gmapsLink, setGmapsLink] = useState("");
-  const {token} = useAuth()
+  const [photo, setPhoto] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { token } = useAuth();
+  const { toast } = useToast();
 
   // Fetch user profile
   useEffect(() => {
@@ -33,12 +40,14 @@ export default function page() {
         if (response.ok) {
           const data = await response.json();
           setName(data.data.name || "");
+          setUsername(data.data.username || "");
           setEmail(data.data.email || "");
           setPhone(data.data.phone || "");
           setBirthDate(data.data.birth_date || "");
           setAddress(data.data.address || "");
           setGender(data.data.gender || "");
-          setGmapsLink(data.data.gmapsLink || "");
+          setGmapsLink(data.data.link_gmaps || "");
+          setPhoto(data.data.photo_url || "");
         } else {
           console.error("Failed to fetch user profile");
         }
@@ -53,43 +62,60 @@ export default function page() {
   async function editProfileHandler(e: React.FormEvent) {
     e.preventDefault();
     if (!token) return;
-
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/profile`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              name,
-              email,
-              photo: "",
-              username: "",
-              gender: gender === "" ? "Laki-Laki" : gender,
-              birt_date: birthDate,
-              _method: "PATCH"
-            }),
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-
-        } else {
-          console.error("Failed to Update user profile");
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/profile`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            username: username,
+            gender: gender === "" ? "Laki-Laki" : gender,
+            birth_date: birthDate,
+            phone,
+            address: address,
+            link_gmaps: gmapsLink,
+            _method: "PATCH",
+          }),
         }
-      } catch (error) {
-        console.error("Error Update user profile:", error);
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+      } else {
+        console.error("Failed to Update user profile");
       }
+
+      toast({
+        title: (
+          <div className="flex items-center gap-2">
+            <FaRegCheckCircle className="text-green-500 text-xl" />
+            <span className="font-bold text-lg text-gray-800">
+              Profile Berhasil Disimpan!
+            </span>
+          </div>
+        ),
+      });
+    } catch (error) {
+      console.error("Error Update user profile:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <div className="container mx-auto py-32">
-      <form onSubmit={editProfileHandler} className="bg-gray-100 rounded-xl p-10 w-full max-w-2xl mx-auto">
+      <form
+        onSubmit={editProfileHandler}
+        className="bg-gray-100 rounded-xl p-10 w-full max-w-2xl mx-auto"
+      >
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-5">
             <Image
@@ -104,12 +130,18 @@ export default function page() {
               <h1 className="font-semibold text-sm">{email}</h1>
             </div>
           </div>
-          <button
-            type="submit"
-            className="rounded-lg bg-[#F7411B] text-white px-6 py-2"
-          >
-            Save
-          </button>
+          {isLoading ? (
+            <div className="flex justify-center mb-4">
+              <Loading /> {/* Komponen loading ditampilkan */}
+            </div>
+          ) : (
+            <button
+              type="submit"
+              className="rounded-lg bg-[#F7411B] text-white px-6 py-2"
+            >
+              Save
+            </button>
+          )}
         </div>
         <div className="flex gap-5">
           <div className="w-1/2">
@@ -134,6 +166,16 @@ export default function page() {
               />
             </div>
             <div>
+              <p className="text-sm">Username</p>
+              <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                type="text"
+                placeholder="Enter your Username"
+                className="w-full p-3 border mb-4 mt-2 rounded-lg"
+              />
+            </div>
+            <div>
               <p className="text-sm">Tanggal Lahir</p>
               <input
                 type="date"
@@ -149,7 +191,9 @@ export default function page() {
                 onChange={(e) => setGender(e.target.value)}
                 className="w-full p-3 border mt-2 rounded-lg"
               >
-                <option value="" disabled>Pilih Jenis Kelamin</option>
+                <option value="" disabled>
+                  Pilih Jenis Kelamin
+                </option>
                 <option value="Laki-Laki">Laki-Laki</option>
                 <option value="Perempuan">Perempuan</option>
               </select>
