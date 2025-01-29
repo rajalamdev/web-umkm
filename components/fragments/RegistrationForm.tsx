@@ -77,7 +77,7 @@ export default function RegistrationForm({ onSubmit }: RegistrationFormProps) {
           placeholder="Enter your password"
           className="w-full p-3 border rounded-lg mb-4"
         />
-        <div className="relative">
+        <div className="relative w-[20rem]">
           <input
             type={showPassword ? "text" : "password"}
             value={passwordConfirmation}

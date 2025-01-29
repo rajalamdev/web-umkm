@@ -14,6 +14,7 @@ export default function OtpInput({
 }: OtpInputProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   useEffect(() => {
     // Auto-focus first input on mount
@@ -67,7 +68,32 @@ export default function OtpInput({
   };
 
   const handleResend = async () => {
-    // Resend OTP logic here
+    setResendLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/resend-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        const errorMessage =
+          data.meta?.validations?.email?.[0] || "Failed to resend OTP";
+        throw new Error(errorMessage);
+      }
+
+      console.log("OTP resent successfully");
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   return (
@@ -102,8 +128,12 @@ export default function OtpInput({
           Verify
         </button>
       )}
-      <button onClick={handleResend} className="w-full text-accent">
-        Didn't receive a code? Resend
+      <button
+        onClick={handleResend}
+        className="w-full text-accent"
+        disabled={resendLoading}
+      >
+        {resendLoading ? "Resending..." : "Didn't receive a code? Resend"}
       </button>
     </div>
   );
