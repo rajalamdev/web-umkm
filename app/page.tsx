@@ -227,9 +227,9 @@ export default function Home() {
               image={product.image}
               title={product.title}
               category={product.category}
-              price={product.price}
-              isPopular={product.isPopular}
-              subCategory={product.subCategory}
+              // price={product.price}
+              // isPopular={product.isPopular}
+              // subCategory={product.subCategory}
             />
           ))}
         </div>

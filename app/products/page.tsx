@@ -42,10 +42,14 @@ export default function ProductsPage() {
     }
   }
 
-  // Filter products based on active category
+  // Filter products based on active category (show childs Categories from API)
   const filteredProducts = activeCat
-    ? products.filter((product) => product.category === activeCat)
-    : products;
+    ? category
+        .find((cat) => cat.name === activeCat)
+        ?.childs.map((child) => ({ ...child, parentName: activeCat })) || []
+    : category.flatMap((cat) =>
+        cat.childs.map((child) => ({ ...child, parentName: cat.name }))
+      );
 
   return (
     <div className="container mx-auto py-32">
@@ -81,14 +85,14 @@ export default function ProductsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {filteredProducts.map((product) => (
           <ProductCard
-            key={product.id}
-            id={product.id}
-            image={product.image}
-            title={product.title}
-            category={product.category}
-            price={product.price}
-            isPopular={product.isPopular}
-            subCategory={product.subCategory}
+            key={`${product.slug}-${product.parentName}`}
+            id={product.slug}
+            image={"/image/logo.png"}
+            title={product.name}
+            category={product.slug}
+            // price={product.price}
+            // isPopular={product.isPopular}
+            // subCategory={product.subCategory}
           />
         ))}
       </div>
